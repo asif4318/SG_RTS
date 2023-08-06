@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'package:rts_flutter/services/bus_service.dart';
+import '../models/route.dart' as route_model;
 
 class FetchRoutesScreen extends StatefulWidget {
   const FetchRoutesScreen({Key? key}) : super(key: key);
@@ -9,9 +11,41 @@ class FetchRoutesScreen extends StatefulWidget {
 }
 
 class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
-  _addRoute (BuildContext context) {
+  Isar? isar;
+  List<route_model.Route>? savedRoutes = [];
+
+  _addRoute(BuildContext context, route_model.Route newRoute) async {
     Navigator.of(context).pop();
+    //isar
+    await isar?.writeTxn(() async {
+      await isar?.routes.put(newRoute);
+    });
   }
+
+  _checkIfRouteExistsInDb(route_model.Route route) {
+    bool doesExist = false;
+    isar?.txnSync(() async {
+      var result = await isar?.routes
+          .where()
+          .routeNumberEqualTo(route.routeNumber)
+          .findFirst();
+      doesExist = result != null;
+    });
+    return doesExist;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    isar = Isar.getInstance();
+
+    Future.delayed(Duration.zero, () async {
+      savedRoutes = await isar?.routes.where().findAll();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Ensure the bus API key is set
@@ -29,9 +63,9 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
             if (snapshot.hasError) {
               return Center(
                   child: Text(
-                    '${snapshot.error} occurred',
-                    style: const TextStyle(fontSize: 18),
-                  ));
+                '${snapshot.error} occurred',
+                style: const TextStyle(fontSize: 18),
+              ));
             } else if (snapshot.hasData) {
               // Extracting data from snapshot object
               final data = snapshot.data!;
@@ -49,29 +83,21 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
                             itemCount: data.length,
-                            prototypeItem: const Card(
-                                child: ListTile(
-                                  leading: Icon(
-                                      Icons.transit_enterexit_rounded),
-                                  title: Text("STOP NAME\n"),
-                                  subtitle: Text("ROUTE1, ROUTE2, ROUTE3"),
-                                )),
                             itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () => _addRoute(context),
-                                  child: Card(
-                                      child: ListTile(
-                                        leading:
-                                        const Icon(
-                                            Icons.transit_enterexit_rounded),
-                                        title: Text(data[index].routeName),
-                                        subtitle:
-                                        Text(
-                                            data[index].routeNumber.toString()),
-                                        trailing: const Icon(
-                                            Icons.navigate_next),
-                                      ))
-                              );
+                              if (true) {
+                                return GestureDetector(
+                                    onTap: () async =>
+                                        _addRoute(context, data[index]),
+                                    child: Card(
+                                        child: ListTile(
+                                      leading: const Icon(
+                                          Icons.transit_enterexit_rounded),
+                                      title: Text(data[index].routeName),
+                                      subtitle: Text(
+                                          data[index].routeNumber.toString()),
+                                      trailing: const Icon(Icons.navigate_next),
+                                    )));
+                              }
                             }),
                       )
                     ],
@@ -80,10 +106,10 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
           }
           return const Center(
               child: SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(),
-              ));
+            width: 50,
+            height: 50,
+            child: CircularProgressIndicator(),
+          ));
         });
   }
 }

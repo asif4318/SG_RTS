@@ -7,11 +7,11 @@ class RouteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
-        child: ListTile(
-      leading: Icon(Icons.circle),
-      title: Text("Rosa Parks to Butler Plaza TS"),
-      subtitle: Text("{STOP NUMBER} - {num1} .. and more"),
-    ));
+    return Card(
+      child: ListTile(
+          leading: const Icon(Icons.circle),
+          title: Text(route.routeName),
+          subtitle: Text(route.routeNumber.toString())),
+    );
   }
 }

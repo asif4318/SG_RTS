@@ -1,26 +1,25 @@
 import 'dart:convert';
-
 import '../models/route.dart';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 
 class BusService {
-  static const String endpoint = "getroutes";
-
+  final String baseUrl;
+  final String apiKey;
   var client = http.Client();
-  final dio = Dio();
 
-  late Uri url;
+  BusService(this.baseUrl, this.apiKey);
 
-  BusService(String baseURL, String apiKey) {
-    url = Uri.parse("$baseURL$endpoint?format=json&key=$apiKey");
+  // Simple helper function to help build api urls
+  Uri _urlBuilder(String baseUrl, String endpoint, String apiKey) {
+    return Uri.parse("$baseUrl$endpoint?format=json&key=$apiKey");
   }
 
   Future<List<Route>> getRoutes() async {
-    var response = await http.get(
-      url,
+    var response = await client.get(
+      _urlBuilder(baseUrl, "getroutes", apiKey),
       headers: {
-      "content-type": "application/json" // Specify content-type as JSON to prevent empty response body
+        "content-type":
+            "application/json" // Specify content-type as JSON to prevent empty response body
       },
     );
 
@@ -34,7 +33,7 @@ class BusService {
         routes.add(route);
       }
     } else {
-      print(response.body);
+      throw Error();
     }
 
     return routes;

@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:rts_flutter/services/db_service.dart';
+import 'package:rts_flutter/widgets/route_card.dart';
 
-class MyRoutesPage extends StatefulWidget {
-  const MyRoutesPage({super.key});
+class MyRoutesPage extends StatelessWidget {
+  const MyRoutesPage({super.key, required this.dbService});
+  final DbService dbService;
 
   @override
-  State<MyRoutesPage> createState() => _MyRoutesPageState();
-}
-
-class _MyRoutesPageState extends State<MyRoutesPage> {
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16.0),
-      children: const <Widget>[
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.circle),
-            title: const Text("Rosa Parks to Butler Plaza TS"),
-            subtitle: const Text("Stops: 1, 5, 12"),
-          ),
-        ),
-      ],
-    );
+    return StreamBuilder(
+        stream: dbService.getSavedRoutes(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final routes = snapshot.data;
+            if (routes!.isEmpty) {
+              return const Center(child: Text("No saved routes!"));
+            }
+            return ListView.builder(
+              itemCount: routes.length,
+              itemBuilder: (context, index) {
+                return RouteCard(route: routes[index]);
+              },
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        });
   }
 }

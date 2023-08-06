@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:rts_flutter/Screens/add_route_modal.dart';
-import 'package:rts_flutter/Screens/map_page.dart';
-import 'package:rts_flutter/Screens/my_routes.dart';
-import 'package:rts_flutter/Screens/settings_page.dart';
-import 'package:rts_flutter/Screens/trip_planner_page.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:rts_flutter/screens/add_route_modal.dart';
+import 'package:rts_flutter/screens/map_page.dart';
+import 'package:rts_flutter/screens/my_routes.dart';
+import 'package:rts_flutter/screens/settings_page.dart';
+import 'package:rts_flutter/screens/trip_planner_page.dart';
+import 'package:rts_flutter/models/route.dart' as route_model;
+import 'package:isar/isar.dart';
+import 'package:rts_flutter/services/db_service.dart';
 
-import 'Screens/add_route_modal.dart';
+import 'screens/add_route_modal.dart';
 
-void main() => runApp(const FlutterRTSApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  getApplicationDocumentsDirectory().then((value) async =>
+      await Isar.open([route_model.RouteSchema], directory: value.path));
+  runApp(const FlutterRTSApp());
+}
 
 class FlutterRTSApp extends StatelessWidget {
   const FlutterRTSApp({super.key});
@@ -40,14 +49,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    MyRoutesPage(),
-    MapPage(),
-    TripPlannerPage(),
-    SettingsPage()
-  ];
+  final DbService dbService = DbService();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -57,6 +59,14 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> _widgetOptions = <Widget>[
+      MyRoutesPage(
+        dbService: dbService,
+      ),
+      const MapPage(),
+      const TripPlannerPage(),
+      const SettingsPage()
+    ];
     return Scaffold(
       appBar: AppBar(
         // TODO: Make Scaffold text dependent on tab
@@ -94,6 +104,7 @@ class _AppState extends State<App> {
                 showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,
+                  enableDrag: true,
                   useSafeArea: true,
                   showDragHandle: true,
                   builder: (BuildContext context) {

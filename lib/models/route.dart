@@ -1,5 +1,10 @@
+import 'package:isar/isar.dart';
+
+part 'route.g.dart';
+
+@collection
 class Route {
-  final int routeNumber;
+  final Id routeNumber;
   final String routeName;
   final String routeColorHexCode;
   final String routeDesignator;
@@ -10,5 +15,16 @@ class Route {
         routeColorHexCode = json['rtclr'],
         routeDesignator = json['rtdd'];
 
-  Route(this.routeNumber, this.routeName, this.routeColorHexCode, this.routeDesignator);
+  @override
+  bool operator == (Object other) {
+    // TODO: implement ==
+    return other is Route &&
+        other.routeNumber == routeNumber &&
+        other.routeDesignator == routeDesignator &&
+        other.routeName == routeName &&
+        other.routeColorHexCode == routeColorHexCode;
+  }
+
+  Route(this.routeNumber, this.routeName, this.routeColorHexCode,
+      this.routeDesignator);
 }

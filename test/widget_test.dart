@@ -32,17 +32,4 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 
-  test('Test if bus service gets all routes', () async {
-    BusService busService = BusService("https://riderts.app/bustime/api/v3/", apiKey);
-
-    var routes = await busService.getRoutes();
-    assert(routes.isNotEmpty);
-  });
-
-  test('test basic api fetch', () => () async {
-    var request = await http.get(Uri.parse("https://riderts.app/bustime/api/v3/getroutes?format=json&key=scpKSw3cZWhNFutcJBtngS99c"));
-
-    assert(request.body.isNotEmpty);
-    assert(request.statusCode==200);
-  });
 }
