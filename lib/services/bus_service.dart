@@ -5,6 +5,8 @@ import '../models/route.dart' as models;
 import 'package:http/http.dart' as http;
 import 'package:rts_flutter/models/pattern.dart';
 
+import '../models/vehicles.dart';
+
 class BusService {
   final String baseUrl;
   late String apiKey;
@@ -49,6 +51,31 @@ class BusService {
 
     return routes;
   }
+
+  Future<List<Vehicle>>  getVehicles(void Function(List<Vehicle> vehicles) callback, int routeId) async {
+    var response = await client.get(
+      _urlBuilder(baseUrl, "getvehicles", apiKey, "&rt=$routeId"),
+      headers: {
+        "content-type":
+        "application/json" // Specify content-type as JSON to prevent empty response body
+      },
+    );
+
+    List<Vehicle> vehicles = [];
+
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+      for (var element in responseData["bustime-response"]["vehicle"]) {
+        Vehicle vehicle = Vehicle.fromJson(element);
+        vehicles.add(vehicle);
+      }
+      callback(vehicles);
+    } else {
+      throw Error();
+    }
+
+    return vehicles;
+    }
 
   Future<List<Pattern>> getPatterns(
       void Function(List<Pattern> patternParams) callback, int routeId, {Color? color}) async {
