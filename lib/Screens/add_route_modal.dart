@@ -84,8 +84,10 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
                             itemBuilder: (context, index) {
                               if (true) {
                                 return GestureDetector(
-                                    onTap: () async =>
-                                        _addRoute(context, data[index]),
+                                    onTap: () async {
+                                      data[index].isFavorite = true;
+                                      _addRoute(context, data[index]);
+                                    },
                                     child: Card(
                                         child: ListTile(
                                       leading: const Icon(

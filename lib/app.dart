@@ -77,7 +77,7 @@ class _AppState extends State<App> {
           title: Text(destinations.elementAt(_selectedIndex).appBarTitle),
           leading: _selectedIndex == 1
               ? DisplayRoutePopupMenuButton(
-                  dbService: dbService,
+                  busService: busService,
                 )
               : null,
           actions: const [],

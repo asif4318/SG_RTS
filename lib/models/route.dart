@@ -8,6 +8,7 @@ class Route {
   final String routeName;
   final String routeColorHexCode;
   final String routeDesignator;
+  var isFavorite = false;
 
   Route.fromJson(Map<String, dynamic> json)
       : routeNumber = int.parse(json['rt']),

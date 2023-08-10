@@ -7,6 +7,7 @@ class Pattern {
   late List<PatternPoint> points;
   String? detourId;
   List<PatternPoint>? detourPoints;
+  String? colorHex;
 
   Pattern(this.id, this.length, this.direction, this.points);
 

@@ -39,6 +39,7 @@ class _MapPageState extends State<MapPage> {
         locationService.getCurrentLocation((value) => _currentPosition = value);
     _getPatternsFuture =
         busService.getPatterns((patterns) => _patterns = patterns);
+
     super.initState();
   }
 
@@ -63,7 +64,10 @@ class _MapPageState extends State<MapPage> {
               ),
               PolylineLayer(
                 polylines: [
-                  Polyline(strokeWidth: 6.0, points: _patterns?[0].getPoints())
+                  Polyline(color: Colors.blue,strokeWidth: 6.0, points: _patterns?[0].getPoints()),
+                  Polyline(color: Colors.blue,strokeWidth: 6.0, points: _patterns?[1].getPoints()),
+                  Polyline(color: Colors.blue,strokeWidth: 6.0, points: _patterns?[2].getPoints())
+
                 ],
               ),
               MarkerLayer(
