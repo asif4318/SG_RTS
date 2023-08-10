@@ -10,12 +10,11 @@ class MapPage extends StatefulWidget {
   const MapPage({Key? key, required this.busService}) : super(key: key);
 
   @override
-  State<MapPage> createState() => _MapPageState(busService);
+  State<MapPage> createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
   LocationService locationService = LocationService();
-  BusService busService;
   late Future _getCurrentLocationFuture;
   late Future _getPatternsFuture;
   List<Pattern>? _patterns;
@@ -23,22 +22,22 @@ class _MapPageState extends State<MapPage> {
   // Default center if current location can't be found is Reitz Union
   final LatLng defaultPosition = const LatLng(29.646799, -82.348065);
 
-  _MapPageState(this.busService);
 
   drawMarker(BuildContext context, LatLng point) {
     return Marker(
-        builder: (context) => const Icon(Icons.place),
+        builder: (context) => const Icon(Icons.place, color: Colors.deepOrange, size: 30),
         point: point,
         width: 80,
-        height: 80);
+        height: 80
+    );
   }
 
   @override
   void initState() {
     _getCurrentLocationFuture =
-        locationService.getCurrentLocation((value) => _currentPosition = value);
+        locationService.getCurrentLocation((location) => _currentPosition = location);
     _getPatternsFuture =
-        busService.getPatterns((patterns) => _patterns = patterns);
+        widget.busService.getPatterns((patterns) => _patterns = patterns, 33, color: Colors.purple);
 
     super.initState();
   }
@@ -63,12 +62,8 @@ class _MapPageState extends State<MapPage> {
                 maxZoom: 20,
               ),
               PolylineLayer(
-                polylines: [
-                  Polyline(color: Colors.blue,strokeWidth: 6.0, points: _patterns?[0].getPoints()),
-                  Polyline(color: Colors.blue,strokeWidth: 6.0, points: _patterns?[1].getPoints()),
-                  Polyline(color: Colors.blue,strokeWidth: 6.0, points: _patterns?[2].getPoints())
-
-                ],
+                polylines:  _patterns?.map((pattern) =>
+                    Polyline(strokeWidth: 6.0, color: pattern.color ?? Colors.black, points: pattern.getPoints())).toList() ?? []
               ),
               MarkerLayer(
                 markers: [

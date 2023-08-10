@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:rts_flutter/services/bus_service.dart';
-import 'package:rts_flutter/services/db_service.dart';
 
 class DisplayRoutePopupMenuButton extends StatelessWidget {
   final BusService busService;
@@ -17,7 +16,7 @@ class DisplayRoutePopupMenuButton extends StatelessWidget {
               itemBuilder: (context) {
                 return snapshot.data
                         ?.map((e) =>  PopupMenuItem(
-                            value: e.routeNumber, child: Text(e.routeDesignator + ". " + e.routeName)))
+                            value: e.routeNumber, child: Text("${e.routeDesignator}. ${e.routeName}")))
                         .toList() ??
                     [];
               },

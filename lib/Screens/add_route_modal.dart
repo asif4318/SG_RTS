@@ -8,15 +8,14 @@ class FetchRoutesScreen extends StatefulWidget {
   const FetchRoutesScreen({Key? key, required this.busService}) : super(key: key);
 
   @override
-  State<FetchRoutesScreen> createState() => _FetchRoutesScreenState(this.busService);
+  State<FetchRoutesScreen> createState() => _FetchRoutesScreenState();
 }
 
 class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
-  final BusService busService;
   Isar? isar;
   List<route_model.Route>? savedRoutes = [];
 
-  _FetchRoutesScreenState(this.busService);
+  _FetchRoutesScreenState();
 
   _addRoute(BuildContext context, route_model.Route newRoute) async {
     Navigator.of(context).pop();
@@ -26,17 +25,17 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
     });
   }
 
-  _checkIfRouteExistsInDb(route_model.Route route) {
-    bool doesExist = false;
-    isar?.txnSync(() async {
-      var result = await isar?.routes
-          .where()
-          .routeNumberEqualTo(route.routeNumber)
-          .findFirst();
-      doesExist = result != null;
-    });
-    return doesExist;
-  }
+  // _checkIfRouteExistsInDb(route_model.Route route) {
+  //   bool doesExist = false;
+  //   isar?.txnSync(() async {
+  //     var result = await isar?.routes
+  //         .where()
+  //         .routeNumberEqualTo(route.routeNumber)
+  //         .findFirst();
+  //     doesExist = result != null;
+  //   });
+  //   return doesExist;
+  // }
 
   @override
   void initState() {
@@ -53,7 +52,7 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: busService.getRoutes(),
+        future: widget.busService.getRoutes(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If we got an error

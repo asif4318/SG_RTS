@@ -24,16 +24,15 @@ class App extends StatefulWidget {
   final BusService busService = BusService("https://riderts.app/bustime/api/v3/");
 
   @override
-  State<App> createState() => _AppState(busService);
+  State<App> createState() => _AppState();
 }
 
 class _AppState extends State<App> {
   int _selectedIndex = 0;
   final DbService dbService = DbService();
-  final BusService busService;
   late Stream<List<Route>> routes;
 
-  _AppState(this.busService);
+  _AppState();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -61,13 +60,13 @@ class _AppState extends State<App> {
                     return SizedBox(
                         height: MediaQuery.of(context).size.height * 0.85,
                         width: MediaQuery.of(context).size.width,
-                        child: FetchRoutesScreen(busService: busService,));
+                        child: FetchRoutesScreen(busService: widget.busService,));
                   },
                 );
               },
               label: const Text("Add Route"),
               icon: const Icon(Icons.add))),
-      Destination(MapPage(busService: busService), "Map"),
+      Destination(MapPage(busService: widget.busService), "Map"),
       Destination(const TripPlannerPage(), "NaviGator"),
       Destination(const SettingsPage(), "Settings")
     ];
@@ -77,7 +76,7 @@ class _AppState extends State<App> {
           title: Text(destinations.elementAt(_selectedIndex).appBarTitle),
           leading: _selectedIndex == 1
               ? DisplayRoutePopupMenuButton(
-                  busService: busService,
+                  busService: widget.busService,
                 )
               : null,
           actions: const [],

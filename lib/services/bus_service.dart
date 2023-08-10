@@ -1,5 +1,7 @@
 import 'dart:convert';
-import '../models/route.dart';
+import 'package:flutter/material.dart';
+
+import '../models/route.dart' as models;
 import 'package:http/http.dart' as http;
 import 'package:rts_flutter/models/pattern.dart';
 
@@ -23,7 +25,7 @@ class BusService {
     return Uri.parse("$baseUrl$endpoint?format=json&key=$apiKey$params");
   }
 
-  Future<List<Route>> getRoutes() async {
+  Future<List<models.Route>> getRoutes() async {
     var response = await client.get(
       _urlBuilder(baseUrl, "getroutes", apiKey, null),
       headers: {
@@ -32,13 +34,13 @@ class BusService {
       },
     );
 
-    List<Route> routes = [];
+    List<models.Route> routes = [];
 
     // On Success
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
       for (var element in responseData["bustime-response"]["routes"]) {
-        Route route = Route.fromJson(element);
+        models.Route route = models.Route.fromJson(element);
         routes.add(route);
       }
     } else {
@@ -49,9 +51,9 @@ class BusService {
   }
 
   Future<List<Pattern>> getPatterns(
-      void Function(List<Pattern> patternParams) callback) async {
+      void Function(List<Pattern> patternParams) callback, int routeId, {Color? color}) async {
     var response = await client.get(
-      _urlBuilder(baseUrl, "getpatterns", apiKey, "&rt=20"),
+      _urlBuilder(baseUrl, "getpatterns", apiKey, "&rt=$routeId"),
       headers: {
         "content-type":
             "application/json" // Specify content-type as JSON to prevent empty response body
@@ -65,6 +67,7 @@ class BusService {
       var responseData = jsonDecode(response.body);
       for (var element in responseData["bustime-response"]["ptr"]) {
         Pattern pattern = Pattern.fromJson(element);
+        pattern.color = color ?? Colors.deepOrangeAccent;
         patterns.add(pattern);
       }
       callback(patterns);

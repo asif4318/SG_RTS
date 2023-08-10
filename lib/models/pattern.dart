@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 class Pattern {
@@ -7,7 +8,7 @@ class Pattern {
   late List<PatternPoint> points;
   String? detourId;
   List<PatternPoint>? detourPoints;
-  String? colorHex;
+  Color? color;
 
   Pattern(this.id, this.length, this.direction, this.points);
 
