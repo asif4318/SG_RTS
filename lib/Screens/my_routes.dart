@@ -21,6 +21,7 @@ class MyRoutesPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 return RouteCard(route: routes[index]);
               },
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 80),
             );
           } else {
             return const Center(child: CircularProgressIndicator());

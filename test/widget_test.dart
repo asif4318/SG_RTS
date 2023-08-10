@@ -9,12 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:rts_flutter/main.dart';
-import 'package:rts_flutter/services/bus_service.dart';
-import 'package:http/http.dart' as http;
 
 void main() {
-  const String apiKey = "scpKSw3cZWhNFutcJBtngS99c";
-
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const FlutterRTSApp());
@@ -31,5 +27,4 @@ void main() {
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
   });
-
 }

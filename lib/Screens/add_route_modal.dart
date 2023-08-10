@@ -4,15 +4,19 @@ import 'package:rts_flutter/services/bus_service.dart';
 import '../models/route.dart' as route_model;
 
 class FetchRoutesScreen extends StatefulWidget {
-  const FetchRoutesScreen({Key? key}) : super(key: key);
+  final BusService busService;
+  const FetchRoutesScreen({Key? key, required this.busService}) : super(key: key);
 
   @override
-  State<FetchRoutesScreen> createState() => _FetchRoutesScreenState();
+  State<FetchRoutesScreen> createState() => _FetchRoutesScreenState(this.busService);
 }
 
 class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
+  final BusService busService;
   Isar? isar;
   List<route_model.Route>? savedRoutes = [];
+
+  _FetchRoutesScreenState(this.busService);
 
   _addRoute(BuildContext context, route_model.Route newRoute) async {
     Navigator.of(context).pop();
@@ -48,15 +52,8 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure the bus API key is set
-    const cleverApiKey = String.fromEnvironment('CLEVER_API_KEY');
-    if (cleverApiKey.isEmpty) {
-      throw AssertionError('CLEVER_API_KEY is not set');
-    }
-
     return FutureBuilder(
-        future: BusService("https://riderts.app/bustime/api/v3/", cleverApiKey)
-            .getRoutes(),
+        future: busService.getRoutes(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If we got an error
@@ -75,6 +72,7 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
                     children: [
                       const Padding(
                           padding: EdgeInsets.fromLTRB(0, 0, 0, 16.0),
+                          // TODO: Implement Search
                           child: SearchBar(
                             hintText: "Search for a route",
                           )),
