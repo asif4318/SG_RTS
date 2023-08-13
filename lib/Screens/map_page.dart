@@ -82,11 +82,10 @@ class _MapPageState extends ConsumerState<MapPage> {
         busService.getSelectedVehiclesList((vehicles) => _vehicles = vehicles);
 
     _timer = Timer.periodic(
-        const Duration(seconds: 10),
+        const Duration(seconds: 15),
         (Timer t) => setState(() {
               debugPrint("getting vehicle location update");
-              _getVehiclesFuture = busService.getVehicles(
-                  (vehicles) => _vehicles = vehicles, 20);
+              _getVehiclesFuture = busService.getSelectedVehiclesList((vehicles) { _vehicles = vehicles;});
             }));
 
     super.initState();
