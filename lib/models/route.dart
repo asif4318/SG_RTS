@@ -34,7 +34,12 @@ class Route {
   /* Converts the rgb hex code color to a Flutter Color */
   getColor() {
     var colorString = routeColorHexCode.replaceFirst("#", "0xFF");
-    var colorInt = int.parse(colorString);
+    var colorInt = 0;
+    try {
+      colorInt = int.parse(colorString);
+    } catch (e) {
+      throw ErrorDescription("Unable to convert color");
+    }
     return Color(colorInt);
   }
 }

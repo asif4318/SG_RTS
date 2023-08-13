@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:rts_flutter/services/bus_service.dart';
 import 'package:rts_flutter/services/isar_db_service.dart';
 import 'package:rts_flutter/screens/add_route_modal.dart';
 import 'package:rts_flutter/screens/map_page.dart';
@@ -20,8 +19,7 @@ class Destination {
 }
 
 class App extends StatefulWidget {
-  App({super.key});
-  final BusService busService = BusService("https://riderts.app/bustime/api/v3/");
+  const App({super.key});
 
   @override
   State<App> createState() => _AppState();
@@ -60,13 +58,14 @@ class _AppState extends State<App> {
                     return SizedBox(
                         height: MediaQuery.of(context).size.height * 0.85,
                         width: MediaQuery.of(context).size.width,
-                        child: FetchRoutesScreen(busService: widget.busService,));
+                        child: const FetchRoutesScreen()
+                    );
                   },
                 );
               },
               label: const Text("Add Route"),
               icon: const Icon(Icons.add))),
-      Destination(MapPage(busService: widget.busService, dbService: dbService,), "Map"),
+      Destination(const MapPage(), "Map"),
       Destination(const TripPlannerPage(), "NaviGator"),
       Destination(const SettingsPage(), "Settings")
     ];
@@ -75,10 +74,7 @@ class _AppState extends State<App> {
           // TODO: Make Scaffold text dependent on tab
           title: Text(destinations.elementAt(_selectedIndex).appBarTitle),
           leading: _selectedIndex == 1
-              ? DisplayRoutePopupMenuButton(
-                  busService: widget.busService,
-            dbService: dbService,
-                )
+              ? const DisplayRoutePopupMenuButton()
               : null,
           actions: const [],
         ),

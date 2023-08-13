@@ -29,7 +29,7 @@ class Pattern {
         .toList();
     detourId = json.containsKey("dtrid") ? json["dtrid"] : null;
     if (json.containsKey("dtrpt")) {
-      detourPoints = (json['pt'] as List)
+      detourPoints = (json['dtrpt'] as List)
           .map((pointJson) => PatternPoint.fromJson(pointJson))
           .toList();
     }
@@ -51,11 +51,10 @@ class PatternPoint {
 
   PatternPoint.fromJson(Map<String, dynamic> json)
       : index = json["seq"],
-        coordinates =
-            LatLng(json["lat"], json["lon"]),
+        coordinates = LatLng(json["lat"], json["lon"]),
         type = json["typ"] == "S" ? PointType.stop : PointType.waypoint,
         distanceFromPattern = json["pdist"] {
-    json.containsKey("stpid") ? stopId = int.parse(json["stpid"]) : null;
     json.containsKey("stpnm") ? stopName = json["stpnm"] : null;
+    json.containsKey("stpid") ? stopId = int.tryParse(json["stpid"]) : null;
   }
 }

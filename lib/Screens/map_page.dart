@@ -1,27 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import "package:rts_flutter/models/pattern.dart";
 import 'package:flutter_map/flutter_map.dart';
-import 'package:rts_flutter/services/bus_service.dart';
+import 'package:rts_flutter/providers.dart';
 import 'package:rts_flutter/services/location_service.dart';
-import 'package:rts_flutter/services/repository/db_service.dart';
-
 import '../models/vehicles.dart';
 
-class MapPage extends StatefulWidget {
-  final BusService busService;
-  final DbService dbService;
-
-  const MapPage({Key? key, required this.busService, required this.dbService})
-      : super(key: key);
+class MapPage extends ConsumerStatefulWidget {
+  const MapPage({Key? key}) : super(key: key);
 
   @override
-  State<MapPage> createState() => _MapPageState();
+  ConsumerState<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends ConsumerState<MapPage> {
   late Timer _timer;
   LocationService locationService = LocationService();
   final LatLngBounds mapBounds = LatLngBounds(
@@ -77,19 +72,21 @@ class _MapPageState extends State<MapPage> {
 
   @override
   void initState() {
+    final busService = ref.read(busServiceProvider);
+
     _getCurrentLocationFuture = locationService
         .getCurrentLocation((location) => _currentPosition = location);
-    _getPatternsFuture = widget.busService
-        .getSelectedPatterns((patterns) => _patterns = patterns);
+    _getPatternsFuture =
+        busService.getSelectedPatterns((patterns) => _patterns = patterns);
     _getVehiclesFuture =
-        widget.busService.getVehicles((vehicles) => _vehicles = vehicles, 20);
+        busService.getVehicles((vehicles) => _vehicles = vehicles, 20);
 
     _timer = Timer.periodic(
         const Duration(seconds: 10),
         (Timer t) => setState(() {
               debugPrint("getting vehicle location update");
-              _getVehiclesFuture = widget.busService
-                  .getVehicles((vehicles) => _vehicles = vehicles, 20);
+              _getVehiclesFuture = busService.getVehicles(
+                  (vehicles) => _vehicles = vehicles, 20);
             }));
 
     super.initState();
@@ -104,6 +101,12 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(selectedRoutesProvider, (previousValue, nextValue) {
+      _getPatternsFuture =
+          ref.read(busServiceProvider).getSelectedPatterns((patternParams) {
+        _patterns = patternParams;
+      });
+    });
     return FutureBuilder(
       future: Future.wait(
           [_getCurrentLocationFuture, _getPatternsFuture, _getVehiclesFuture]),

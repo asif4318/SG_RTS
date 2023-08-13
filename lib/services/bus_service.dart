@@ -8,8 +8,8 @@ import 'isar_db_service.dart';
 
 class BusService {
   final String baseUrl;
-  late String apiKey;
-  var client = http.Client();
+  late String _apiKey;
+  var _client = http.Client();
   final String _busTime = "bustime-response";
 
   IsarDbService dbService = IsarDbService();
@@ -19,7 +19,7 @@ class BusService {
     if (cleverApiKey.isEmpty) {
       throw AssertionError('CLEVER_API_KEY is not set');
     }
-    apiKey = cleverApiKey;
+    _apiKey = cleverApiKey;
   }
 
   // Simple helper function to help build api urls
@@ -30,8 +30,8 @@ class BusService {
   }
 
   Future<List<models.Route>> getRoutes() async {
-    var response = await client.get(
-      _urlBuilder(baseUrl, "getroutes", apiKey, null),
+    var response = await _client.get(
+      _urlBuilder(baseUrl, "getroutes", _apiKey, null),
       headers: {
         "content-type":
         "application/json"
@@ -57,8 +57,8 @@ class BusService {
 
   Future<List<Vehicle>> getVehicles(
       void Function(List<Vehicle> vehicles) callback, int routeId) async {
-    var response = await client.get(
-      _urlBuilder(baseUrl, "getvehicles", apiKey, "&rt=$routeId"),
+    var response = await _client.get(
+      _urlBuilder(baseUrl, "getvehicles", _apiKey, "&rt=$routeId"),
       headers: {
         "content-type":
         "application/json"
@@ -90,8 +90,8 @@ class BusService {
   Future<List<Pattern>> getPatterns(
       void Function(List<Pattern> patternParams) callback, int routeId,
       {Color? color}) async {
-    var response = await client.get(
-      _urlBuilder(baseUrl, "getpatterns", apiKey, "&rt=$routeId"),
+    var response = await _client.get(
+      _urlBuilder(baseUrl, "getpatterns", _apiKey, "&rt=$routeId"),
       headers: {
         "content-type":
         "application/json"
@@ -120,8 +120,8 @@ class BusService {
   Future<List<Pattern>> getSelectedPatterns(void Function(List<Pattern> patternParams) callback) async {
     var selectedRoutes = await dbService.getSelectedRoutes();
     List<http.Response> list = await Future.wait(selectedRoutes.map((route) =>
-        client.get(
-            _urlBuilder(baseUrl, "getpatterns", apiKey, "&rt=${route.routeNumber}"))));
+        _client.get(
+            _urlBuilder(baseUrl, "getpatterns", _apiKey, "&rt=${route.routeNumber}"))));
 
     List<Pattern> patterns = [];
     var maxIndex = selectedRoutes.length;
@@ -129,9 +129,13 @@ class BusService {
     for (int i = 0; i < maxIndex; i++) {
       var responseData = jsonDecode(list[i].body);
       for (var element in responseData["bustime-response"]["ptr"]) {
-        Pattern pattern = Pattern.fromJson(element);
-        pattern.color = selectedRoutes[i].getColor();
-        patterns.add(pattern);
+        try {
+          Pattern pattern = Pattern.fromJson(element);
+          pattern.color = selectedRoutes[i].getColor();
+          patterns.add(pattern);
+        } catch (exception) {
+          throw ErrorDescription("Error decoding pattern");
+        }
       }
     }
 

@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:rts_flutter/models/route.dart' as route_model;
-import 'package:isar/isar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rts_flutter/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  getApplicationDocumentsDirectory().then((value) async =>
-      await Isar.open([route_model.RouteSchema], directory: value.path));
-  runApp(const FlutterRTSApp());
+  runApp(const ProviderScope(child: FlutterRTSApp()));
 }
 
 class FlutterRTSApp extends StatelessWidget {
@@ -26,7 +22,7 @@ class FlutterRTSApp extends StatelessWidget {
         useMaterial3: true);
 
     return MaterialApp(
-      home: App(),
+      home: const App(),
       theme: brightThemeData,
       darkTheme: darkThemeData,
     );

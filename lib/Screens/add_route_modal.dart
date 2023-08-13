@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
-import 'package:rts_flutter/services/bus_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/route.dart' as route_model;
+import 'package:rts_flutter/providers.dart';
 
-class FetchRoutesScreen extends StatefulWidget {
-  final BusService busService;
-  const FetchRoutesScreen({Key? key, required this.busService}) : super(key: key);
+class FetchRoutesScreen extends ConsumerStatefulWidget {
+  const FetchRoutesScreen({Key? key}) : super(key: key);
 
   @override
-  State<FetchRoutesScreen> createState() => _FetchRoutesScreenState();
+  ConsumerState<FetchRoutesScreen> createState() => _FetchRoutesScreenState();
 }
 
-class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
-  Isar? isar;
+class _FetchRoutesScreenState extends ConsumerState<FetchRoutesScreen> {
   List<route_model.Route>? savedRoutes = [];
 
   _FetchRoutesScreenState();
 
   _addRoute(BuildContext context, route_model.Route newRoute) async {
     Navigator.of(context).pop();
-    //isar
-    await isar?.writeTxn(() async {
-      await isar?.routes.put(newRoute);
-    });
+    ref.read(dbProvider).upsertRoutes([newRoute]);
   }
 
   @override
@@ -30,17 +25,17 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
     // TODO: implement initState
     super.initState();
 
-    isar = Isar.getInstance();
-
-    Future.delayed(Duration.zero, () async {
-      savedRoutes = await isar?.routes.where().findAll();
-    });
+/*    Future.delayed(Duration.zero, () async {
+      savedRoutes = ref.read(isarProvider).getFavoriteRoutes()
+    });*/
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.read(dbProvider);
+    final busService = ref.read(busServiceProvider);
     return FutureBuilder(
-        future: widget.busService.getRoutes(),
+        future: busService.getRoutes(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             // If we got an error

@@ -1,50 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:rts_flutter/services/bus_service.dart';
-import 'package:rts_flutter/services/repository/db_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rts_flutter/providers.dart';
 
-class DisplayRoutePopupMenuButton extends StatefulWidget {
-  final BusService busService;
-  final DbService dbService;
+class DisplayRoutePopupMenuButton extends ConsumerWidget {
 
-  const DisplayRoutePopupMenuButton({Key? key, required this.busService, required this.dbService})
-      : super(key: key);
+  const DisplayRoutePopupMenuButton({Key? key});
 
   @override
-  State<DisplayRoutePopupMenuButton> createState() =>
-      _DisplayRoutePopupMenuButtonState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dbService = ref.read(dbProvider);
+    final busService = ref.read(busServiceProvider);
 
-class _DisplayRoutePopupMenuButtonState extends State<DisplayRoutePopupMenuButton> {
-
-  @override
-  Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait([widget.busService.getRoutes(), widget.dbService.getSelectedRoutes()]),
+      future: Future.wait([busService.getRoutes()]),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        final selectedRoutes = ref.watch(selectedRoutesProvider);
+        if (snapshot.hasData && !selectedRoutes.isLoading) {
           final allRoutes = snapshot.data![0];
-          final selectedRoutes = snapshot.data![1];
-
           return PopupMenuButton(
             itemBuilder: (context) {
               return allRoutes
                   .map((e) => CheckedPopupMenuItem(
                 value: e.routeNumber,
-                checked: selectedRoutes.any((element) => element.routeNumber == e.routeNumber),
+                checked: selectedRoutes.value!.any((element) => element.routeNumber == e.routeNumber),
                 child: Text("${e.routeDesignator}. ${e.routeName}"),
               ))
                   .toList();
             },
             onSelected: (routeNumber) async {
-              final selectedRoute = selectedRoutes.firstWhere((element) => element.routeNumber == routeNumber, orElse: () => allRoutes.firstWhere((element) => element.routeNumber == routeNumber));
+              final selectedRoute = selectedRoutes.value!.firstWhere((element) => element.routeNumber == routeNumber, orElse: () => allRoutes.firstWhere((element) => element.routeNumber == routeNumber));
 
               if (selectedRoute != null) {
                 final isSelected = selectedRoute.isSelected;
                 selectedRoute.isSelected = !isSelected;
-                await widget.dbService.upsertRoutes([selectedRoute]);
+                await dbService.upsertRoutes([selectedRoute]);
+                ref.invalidate(selectedRoutesProvider);
               }
-
-              setState(() {});
             },
             icon: const Icon(Icons.add_road),
           );
@@ -53,4 +44,5 @@ class _DisplayRoutePopupMenuButtonState extends State<DisplayRoutePopupMenuButto
       },
     );
   }
+
 }
