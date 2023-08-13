@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 enum CardinalDirection {
@@ -38,6 +39,7 @@ class Vehicle {
   String destination;
   bool delay = false;
   int speed;
+  Color? color;
 
   Vehicle(this.id, this.coordinates, this.heading, this.patternId,
       this.patternDistance, this.routeId, this.destination, this.delay, this.speed);

@@ -35,21 +35,21 @@ class _MapPageState extends ConsumerState<MapPage> {
     List<Marker> markers = [];
     if (_vehicles != null) {
       for (var bus in _vehicles!) {
-        markers.add(drawBusMarker(context, bus.coordinates));
+        markers.add(drawBusMarker(context, bus.coordinates, bus.color));
       }
     }
     return markers;
   }
 
-  drawBusMarker(BuildContext context, LatLng point) {
+  drawBusMarker(BuildContext context, LatLng point, Color? color) {
     return Marker(
         builder: (context) => Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.directions_bus_rounded,
-                  color: Colors.deepOrangeAccent, size: 30),
+              child: Icon(Icons.directions_bus_rounded,
+                  color: color ?? Colors.white, size: 30),
             ),
         point: point,
         width: 40,
@@ -79,7 +79,7 @@ class _MapPageState extends ConsumerState<MapPage> {
     _getPatternsFuture =
         busService.getSelectedPatterns((patterns) => _patterns = patterns);
     _getVehiclesFuture =
-        busService.getVehicles((vehicles) => _vehicles = vehicles, 20);
+        busService.getSelectedVehiclesList((vehicles) => _vehicles = vehicles);
 
     _timer = Timer.periodic(
         const Duration(seconds: 10),
@@ -101,12 +101,14 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final busService = ref.read(busServiceProvider);
     ref.listen(selectedRoutesProvider, (previousValue, nextValue) {
       _getPatternsFuture =
           ref.read(busServiceProvider).getSelectedPatterns((patternParams) {
         _patterns = patternParams;
         setState(() {});
       });
+      _getVehiclesFuture = busService.getSelectedVehiclesList((vehicles) {_vehicles = vehicles;});
     });
     return FutureBuilder(
       future: Future.wait(
