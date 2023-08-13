@@ -105,6 +105,7 @@ class _MapPageState extends ConsumerState<MapPage> {
       _getPatternsFuture =
           ref.read(busServiceProvider).getSelectedPatterns((patternParams) {
         _patterns = patternParams;
+        setState(() {});
       });
     });
     return FutureBuilder(

@@ -4,7 +4,7 @@ import 'package:rts_flutter/providers.dart';
 
 class DisplayRoutePopupMenuButton extends ConsumerWidget {
 
-  const DisplayRoutePopupMenuButton({Key? key});
+  const DisplayRoutePopupMenuButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
