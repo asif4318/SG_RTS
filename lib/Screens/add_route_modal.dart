@@ -25,18 +25,6 @@ class _FetchRoutesScreenState extends State<FetchRoutesScreen> {
     });
   }
 
-  // _checkIfRouteExistsInDb(route_model.Route route) {
-  //   bool doesExist = false;
-  //   isar?.txnSync(() async {
-  //     var result = await isar?.routes
-  //         .where()
-  //         .routeNumberEqualTo(route.routeNumber)
-  //         .findFirst();
-  //     doesExist = result != null;
-  //   });
-  //   return doesExist;
-  // }
-
   @override
   void initState() {
     // TODO: implement initState
