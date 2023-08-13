@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rts_flutter/services/bus_service.dart';
-import 'package:rts_flutter/services/db_service.dart';
+import 'package:rts_flutter/services/isar_db_service.dart';
 import 'package:rts_flutter/screens/add_route_modal.dart';
 import 'package:rts_flutter/screens/map_page.dart';
 import 'package:rts_flutter/screens/my_routes.dart';
@@ -29,7 +29,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   int _selectedIndex = 0;
-  final DbService dbService = DbService();
+  final IsarDbService dbService = IsarDbService();
   late Stream<List<Route>> routes;
 
   _AppState();

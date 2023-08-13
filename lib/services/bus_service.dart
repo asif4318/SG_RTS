@@ -4,7 +4,7 @@ import '../models/route.dart' as models;
 import 'package:http/http.dart' as http;
 import 'package:rts_flutter/models/pattern.dart';
 import '../models/vehicles.dart';
-import 'db_service.dart';
+import 'isar_db_service.dart';
 
 class BusService {
   final String baseUrl;
@@ -12,7 +12,7 @@ class BusService {
   var client = http.Client();
   final String _busTime = "bustime-response";
 
-  DbService dbService = DbService();
+  IsarDbService dbService = IsarDbService();
 
   BusService(this.baseUrl) {
     const cleverApiKey = String.fromEnvironment('CLEVER_API_KEY');
