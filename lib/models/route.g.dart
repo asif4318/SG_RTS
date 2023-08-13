@@ -22,18 +22,23 @@ const RouteSchema = CollectionSchema(
       name: r'isFavorite',
       type: IsarType.bool,
     ),
-    r'routeColorHexCode': PropertySchema(
+    r'isSelected': PropertySchema(
       id: 1,
+      name: r'isSelected',
+      type: IsarType.bool,
+    ),
+    r'routeColorHexCode': PropertySchema(
+      id: 2,
       name: r'routeColorHexCode',
       type: IsarType.string,
     ),
     r'routeDesignator': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'routeDesignator',
       type: IsarType.string,
     ),
     r'routeName': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'routeName',
       type: IsarType.string,
     )
@@ -71,9 +76,10 @@ void _routeSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeBool(offsets[0], object.isFavorite);
-  writer.writeString(offsets[1], object.routeColorHexCode);
-  writer.writeString(offsets[2], object.routeDesignator);
-  writer.writeString(offsets[3], object.routeName);
+  writer.writeBool(offsets[1], object.isSelected);
+  writer.writeString(offsets[2], object.routeColorHexCode);
+  writer.writeString(offsets[3], object.routeDesignator);
+  writer.writeString(offsets[4], object.routeName);
 }
 
 Route _routeDeserialize(
@@ -84,11 +90,12 @@ Route _routeDeserialize(
 ) {
   final object = Route(
     id,
-    reader.readString(offsets[3]),
-    reader.readString(offsets[1]),
+    reader.readString(offsets[4]),
     reader.readString(offsets[2]),
+    reader.readString(offsets[3]),
   );
   object.isFavorite = reader.readBool(offsets[0]);
+  object.isSelected = reader.readBool(offsets[1]);
   return object;
 }
 
@@ -102,10 +109,12 @@ P _routeDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
+      return (reader.readString(offset)) as P;
+    case 4:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -209,6 +218,16 @@ extension RouteQueryFilter on QueryBuilder<Route, Route, QFilterCondition> {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isFavorite',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Route, Route, QAfterFilterCondition> isSelectedEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isSelected',
         value: value,
       ));
     });
@@ -678,6 +697,18 @@ extension RouteQuerySortBy on QueryBuilder<Route, Route, QSortBy> {
     });
   }
 
+  QueryBuilder<Route, Route, QAfterSortBy> sortByIsSelected() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSelected', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Route, Route, QAfterSortBy> sortByIsSelectedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSelected', Sort.desc);
+    });
+  }
+
   QueryBuilder<Route, Route, QAfterSortBy> sortByRouteColorHexCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'routeColorHexCode', Sort.asc);
@@ -725,6 +756,18 @@ extension RouteQuerySortThenBy on QueryBuilder<Route, Route, QSortThenBy> {
   QueryBuilder<Route, Route, QAfterSortBy> thenByIsFavoriteDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isFavorite', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Route, Route, QAfterSortBy> thenByIsSelected() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSelected', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Route, Route, QAfterSortBy> thenByIsSelectedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isSelected', Sort.desc);
     });
   }
 
@@ -784,6 +827,12 @@ extension RouteQueryWhereDistinct on QueryBuilder<Route, Route, QDistinct> {
     });
   }
 
+  QueryBuilder<Route, Route, QDistinct> distinctByIsSelected() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isSelected');
+    });
+  }
+
   QueryBuilder<Route, Route, QDistinct> distinctByRouteColorHexCode(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -818,6 +867,12 @@ extension RouteQueryProperty on QueryBuilder<Route, Route, QQueryProperty> {
   QueryBuilder<Route, bool, QQueryOperations> isFavoriteProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isFavorite');
+    });
+  }
+
+  QueryBuilder<Route, bool, QQueryOperations> isSelectedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isSelected');
     });
   }
 

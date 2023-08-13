@@ -10,6 +10,7 @@ class Route {
   final String routeColorHexCode;
   final String routeDesignator;
   var isFavorite = false;
+  bool isSelected = false;
 
   Route.fromJson(Map<String, dynamic> json)
       : routeNumber = int.parse(json['rt']),

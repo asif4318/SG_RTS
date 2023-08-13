@@ -5,14 +5,14 @@ import 'package:latlong2/latlong.dart';
 import "package:rts_flutter/models/pattern.dart";
 import 'package:flutter_map/flutter_map.dart';
 import 'package:rts_flutter/services/bus_service.dart';
-import 'package:rts_flutter/services/isar_db_service.dart';
 import 'package:rts_flutter/services/location_service.dart';
+import 'package:rts_flutter/services/repository/db_service.dart';
 
 import '../models/vehicles.dart';
 
 class MapPage extends StatefulWidget {
   final BusService busService;
-  final IsarDbService dbService;
+  final DbService dbService;
 
   const MapPage({Key? key, required this.busService, required this.dbService})
       : super(key: key);

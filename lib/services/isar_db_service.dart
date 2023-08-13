@@ -30,13 +30,13 @@ class IsarDbService implements DbService  {
   @override
   Future<List<Route>> getSelectedRoutes() async {
     final isar = await db;
-    return isar.routes.where().findAll();
+    return isar.routes.filter().isSelectedEqualTo(true).findAll();
   }
 
   @override
   void upsertRoutes(List<Route> routesList) async {
     final isar = await db;
-    await isar.routes.putAll(routesList);
+    await isar.writeTxn(() async => await isar.routes.putAll(routesList));
   }
 
   @override

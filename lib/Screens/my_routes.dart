@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rts_flutter/services/isar_db_service.dart';
+import 'package:rts_flutter/services/repository/db_service.dart';
 import 'package:rts_flutter/widgets/route_card.dart';
 
 class MyRoutesPage extends StatelessWidget {
   const MyRoutesPage({super.key, required this.dbService});
-  final IsarDbService dbService;
+  final DbService dbService;
 
   @override
   Widget build(BuildContext context) {
