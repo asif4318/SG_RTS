@@ -34,7 +34,7 @@ class IsarDbService implements DbService  {
   }
 
   @override
-  void upsertRoutes(List<Route> routesList) async {
+  Future upsertRoutes(List<Route> routesList) async {
     final isar = await db;
     await isar.writeTxn(() async => await isar.routes.putAll(routesList));
   }

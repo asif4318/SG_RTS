@@ -5,7 +5,7 @@ abstract class DbService {
 
   Future<List<Route>> getSelectedRoutes();
 
-  void upsertRoutes(List<Route> routesList);
+  Future upsertRoutes(List<Route> routesList);
 
   Future<List<Route>> getRoutes();
 }
