@@ -66,7 +66,7 @@ class _AppState extends State<App> {
               },
               label: const Text("Add Route"),
               icon: const Icon(Icons.add))),
-      Destination(MapPage(busService: widget.busService), "Map"),
+      Destination(MapPage(busService: widget.busService, dbService: dbService,), "Map"),
       Destination(const TripPlannerPage(), "NaviGator"),
       Destination(const SettingsPage(), "Settings")
     ];

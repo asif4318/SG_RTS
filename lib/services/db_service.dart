@@ -22,4 +22,20 @@ class DbService {
     final isar = await db;
     yield* isar.routes.where().watch(fireImmediately: true);
   }
+
+  Future<List<Route>> getSelectedRoutes() async {
+    final isar = await db;
+    return isar.routes.where().findAll();
+  }
+
+  void saveRoutes(List<Route> routesList) async {
+    final isar = await db;
+    await isar.routes.putAll(routesList);
+  }
+
+  Future<List<Route>> getRoutes() async {
+    final isar = await db;
+    final routes = await isar.routes.where().findAll();
+    return routes;
+  }
 }

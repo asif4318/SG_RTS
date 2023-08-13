@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
 part 'route.g.dart';
@@ -28,4 +29,11 @@ class Route {
 
   Route(this.routeNumber, this.routeName, this.routeColorHexCode,
       this.routeDesignator);
+
+  /* Converts the rgb hex code color to a Flutter Color */
+  getColor() {
+    var colorString = routeColorHexCode.replaceFirst("#", "0xFF");
+    var colorInt = int.parse(colorString);
+    return Color(colorInt);
+  }
 }
