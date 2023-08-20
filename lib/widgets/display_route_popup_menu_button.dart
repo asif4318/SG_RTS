@@ -30,12 +30,10 @@ class DisplayRoutePopupMenuButton extends ConsumerWidget {
             onSelected: (routeNumber) async {
               final selectedRoute = selectedRoutes.value!.firstWhere((element) => element.routeNumber == routeNumber, orElse: () => allRoutes.firstWhere((element) => element.routeNumber == routeNumber));
 
-              if (selectedRoute != null) {
-                final isSelected = selectedRoute.isSelected;
-                selectedRoute.isSelected = !isSelected;
-                await dbService.upsertRoutes([selectedRoute]);
-                ref.invalidate(selectedRoutesProvider);
-              }
+              final isSelected = selectedRoute.isSelected;
+              selectedRoute.isSelected = !isSelected;
+              await dbService.upsertRoutes([selectedRoute]);
+              ref.invalidate(selectedRoutesProvider);
             },
             icon: const Icon(Icons.add_road),
           );

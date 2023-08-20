@@ -9,7 +9,7 @@ import 'isar_db_service.dart';
 class BusService {
   final String baseUrl;
   late String _apiKey;
-  var _client = http.Client();
+  final _client = http.Client();
   final String _busTime = "bustime-response";
 
   IsarDbService dbService = IsarDbService();

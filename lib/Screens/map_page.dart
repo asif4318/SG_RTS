@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:rts_flutter/providers.dart';
 import 'package:rts_flutter/services/location_service.dart';
 import '../models/vehicles.dart';
+import '../widgets/vehicle_info_sheet.dart';
 
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -35,25 +35,39 @@ class _MapPageState extends ConsumerState<MapPage> {
     List<Marker> markers = [];
     if (_vehicles != null) {
       for (var bus in _vehicles!) {
-        markers.add(drawBusMarker(context, bus.coordinates, bus.color));
+        markers.add(drawBusMarker(context, bus));
       }
     }
     return markers;
   }
 
-  drawBusMarker(BuildContext context, LatLng point, Color? color) {
+  drawBusMarker(BuildContext context, Vehicle bus) {
     return Marker(
         builder: (context) => Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.directions_bus_rounded,
-                  color: color ?? Colors.white, size: 30),
+              child: GestureDetector(
+                onTapDown: (details) {
+                  debugPrint("Tapped bus icon");
+                  _showActionSheet(bus);
+                },
+                child: Icon(Icons.directions_bus_rounded,
+                    color: bus.color ?? Colors.white, size: 30),
+              ),
             ),
-        point: point,
+        point: bus.coordinates,
         width: 40,
         height: 40);
+  }
+
+  _showActionSheet(Vehicle bus) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return VehicleInfoActionSheet(bus: bus);
+        });
   }
 
   drawMarker(BuildContext context, LatLng point) {
@@ -85,7 +99,10 @@ class _MapPageState extends ConsumerState<MapPage> {
         const Duration(seconds: 15),
         (Timer t) => setState(() {
               debugPrint("getting vehicle location update");
-              _getVehiclesFuture = busService.getSelectedVehiclesList((vehicles) { _vehicles = vehicles;});
+              _getVehiclesFuture =
+                  busService.getSelectedVehiclesList((vehicles) {
+                _vehicles = vehicles;
+              });
             }));
 
     super.initState();
@@ -93,9 +110,8 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
-    _timer.cancel();
+    _timer.cancel(); // Cancel the timer to prevent memory leaks on dispose
   }
 
   @override
@@ -107,7 +123,9 @@ class _MapPageState extends ConsumerState<MapPage> {
         _patterns = patternParams;
         setState(() {});
       });
-      _getVehiclesFuture = busService.getSelectedVehiclesList((vehicles) {_vehicles = vehicles;});
+      _getVehiclesFuture = busService.getSelectedVehiclesList((vehicles) {
+        _vehicles = vehicles;
+      });
     });
     return FutureBuilder(
       future: Future.wait(

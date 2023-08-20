@@ -25,6 +25,7 @@ class FlutterRTSApp extends StatelessWidget {
       home: const App(),
       theme: brightThemeData,
       darkTheme: darkThemeData,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

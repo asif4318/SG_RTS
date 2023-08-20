@@ -12,12 +12,8 @@ class Pattern {
 
   Pattern(this.id, this.length, this.direction, this.points);
 
-  getPoints() {
-    List<LatLng> coords = [];
-    for (var element in points) {
-      coords.add(element.coordinates);
-    }
-    return coords;
+  List<LatLng> getPoints() {
+    return points.map((p) => p.coordinates).toList();
   }
 
   Pattern.fromJson(Map<String, dynamic> json)
