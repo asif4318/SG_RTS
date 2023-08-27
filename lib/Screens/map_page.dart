@@ -59,12 +59,17 @@ class _MapPageState extends ConsumerState<MapPage> {
             ),
         point: bus.coordinates,
         width: 40,
-        height: 40);
+        height: 40,
+        key: Key(bus.id.toString()));
   }
 
   _showActionSheet(Vehicle bus) {
     showModalBottomSheet(
         context: context,
+        isDismissible: true,
+        showDragHandle: true,
+        useSafeArea: true,
+        enableDrag: true,
         builder: (BuildContext context) {
           return VehicleInfoActionSheet(bus: bus);
         });

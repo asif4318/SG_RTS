@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:rts_flutter/models/prediction.dart';
 import '../models/route.dart' as models;
 import 'package:http/http.dart' as http;
 import 'package:rts_flutter/models/pattern.dart';
@@ -23,8 +24,8 @@ class BusService {
   }
 
   // Simple helper function to help build api urls
-  Uri _urlBuilder(
-      String baseUrl, String endpoint, String apiKey, String? params) {
+  Uri _urlBuilder(String baseUrl, String endpoint, String apiKey,
+      String? params) {
     params = params ?? "";
     return Uri.parse("$baseUrl$endpoint?format=json&key=$apiKey$params");
   }
@@ -52,6 +53,61 @@ class BusService {
     }
 
     return routes;
+  }
+
+  getPredictionFromVehicle(int busId) async {
+    var response = await _client.get(_urlBuilder(baseUrl, "getpredictions", _apiKey, "&vid=$busId"));
+    List<Prediction> predictions = [];
+
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body)[_busTime];
+      if (!responseData.containsKey('!error')) {
+        for (var element in responseData["prd"]) {
+          predictions.add(Prediction.fromJson(element));
+        }
+      }
+    }
+    return predictions;
+  }
+
+  Stream<Pattern> getPatternsFromVehicles(List<Vehicle> vehicles) async* {
+    List<Pattern> patterns = [];
+
+    // We can combine up to 10 ids at a time into a single API call
+    var patternIds = vehicles.map((e) => e.patternId).toList();
+
+    // Create the chunks of ten
+    List<List<int>> patternIdChunks = [];
+
+    while (patternIds.length >= 10) {
+      var sublist = patternIds.sublist(patternIds.length - 10);
+      patternIds.removeRange(patternIds.length - 10, patternIds.length);
+      patternIdChunks.add(sublist);
+    }
+
+    if (patternIds.isNotEmpty) {
+      // Add the remaining patternIds if any
+      patternIdChunks.add(patternIds);
+    }
+
+    var requestList = patternIdChunks.map((chunk) =>
+        _client.get(_urlBuilder(
+            baseUrl, "getpatterns", _apiKey, "&pid=${chunk.join(',')}"))).toList();
+
+    for (var request in requestList) {
+      var responseData = await request;
+      if (responseData.statusCode == 200) {
+        try {
+          var busTimeResponse = jsonDecode(responseData.body)[_busTime];
+          yield Pattern.fromJson(busTimeResponse);
+        } catch (e) {
+          // Do something
+          debugPrint("Error while fetching patterns from vehicle IDs");
+          debugPrintStack();
+        }
+      }
+
+    }
   }
 
   Future<List<Vehicle>> getSelectedVehiclesList(
@@ -155,13 +211,15 @@ class BusService {
 
     for (int i = 0; i < maxIndex; i++) {
       var responseData = jsonDecode(list[i].body);
-      for (var element in responseData["bustime-response"]["ptr"]) {
-        try {
-          Pattern pattern = Pattern.fromJson(element);
-          pattern.color = selectedRoutes[i].getColor();
-          patterns.add(pattern);
-        } catch (exception) {
-          throw ErrorDescription("Error decoding pattern");
+      if (responseData["bustime-response"].containsKey("ptr")) {
+        for (var element in responseData["bustime-response"]["ptr"]) {
+          try {
+            Pattern pattern = Pattern.fromJson(element);
+            pattern.color = selectedRoutes[i].getColor();
+            patterns.add(pattern);
+          } catch (exception) {
+            throw ErrorDescription("Error decoding pattern");
+          }
         }
       }
     }
